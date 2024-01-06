@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -8,6 +8,7 @@ import RecentExpenses from "./screens/RecentExpenses.screen";
 import AllExpenses from "./screens/AllExpenses.screen";
 import colors from "./constants/colors";
 import { Ionicons } from "@expo/vector-icons";
+import IconButton from "./components/iconButton/IconButton.component";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -20,6 +21,9 @@ function ExpensesOverview() {
         headerTintColor: "white",
         tabBarStyle: { backgroundColor: colors.primary500 },
         tabBarActiveTintColor: colors.accent500,
+        headerRight: ({ tintColor }) => (
+          <IconButton onPress={() => console.log("pressed")} icon="add" color={tintColor} size={30} />
+        ),
       }}
     >
       <Tab.Screen
