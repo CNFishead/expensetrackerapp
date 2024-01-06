@@ -1,8 +1,19 @@
 import React from "react";
-import { Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import ExpensesOutput from "../components/expensesOutput/ExpensesOutput.component";
 
 const AllExpenses = () => {
-  return <Text>AllExpenses</Text>;
+  return (
+    <View style={styles.rootContainer}>
+      <ExpensesOutput />
+    </View>
+  );
 };
 
 export default AllExpenses;
+
+const styles = StyleSheet.create({
+  rootContainer: {
+    flex: 1,
+  },
+});
