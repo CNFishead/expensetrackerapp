@@ -9,6 +9,8 @@ import AllExpenses from "./screens/AllExpenses.screen";
 import colors from "./constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import IconButton from "./components/iconButton/IconButton.component";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -49,7 +51,7 @@ function ExpensesOverview() {
 }
 export default function App() {
   return (
-    <>
+    <Provider store={store}>
       <StatusBar style="auto" />
       <NavigationContainer>
         <Stack.Navigator
@@ -75,7 +77,7 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    </Provider>
   );
 }
 
