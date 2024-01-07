@@ -56,10 +56,22 @@ const expenseSlice = createSlice({
   },
   reducers: {
     addExpense(state, action) {
-      state.expenses.push(action.payload);
+      // generate a random id
+      const id = Math.random().toString() + new Date().toString();
+      state.expenses.push({ id, ...action.payload });
     },
     removeExpense(state, action) {
       state.expenses = state.expenses.filter((expense) => expense.id !== action.payload);
+    },
+    updateExpense: (state, action) => {
+      const currentItem = state.expenses.find((el) => el.id === action.payload.item.id);
+      const index = state.expenses.indexOf(currentItem);
+      const updatedItem = {
+        ...currentItem,
+        ...action.payload.item,
+      };
+      // this is possible cause we can mutate it in redux toolkit
+      expenses[index] = updatedItem;
     },
     clearExpenses(state) {
       state.expenses = [];
@@ -68,4 +80,4 @@ const expenseSlice = createSlice({
 });
 
 export default expenseSlice.reducer;
-export const { addExpense, removeExpense, clearExpenses } = expenseSlice.actions;
+export const { addExpense, removeExpense, clearExpenses, updateExpense } = expenseSlice.actions;
