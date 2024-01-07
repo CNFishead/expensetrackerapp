@@ -11,7 +11,7 @@ const IconButton = ({ icon, size, color, onPress }) => {
       style={({ pressed }) => pressed && styles.pressed}
     >
       <View style={styles.buttonContainer}>
-        <Ionicons style={{ marginRight: 10 }} name={icon} size={size} color={color} />
+        <Ionicons style={{}} name={icon} size={size} color={color} />
       </View>
     </Pressable>
   );
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     borderRadius: 24,
     padding: 6,
-    margin: 8,
+    marginHorizontal: 8,
   },
   pressed: {
     opacity: 0.5,
