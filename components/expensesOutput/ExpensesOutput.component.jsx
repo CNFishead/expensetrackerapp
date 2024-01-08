@@ -1,9 +1,10 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import ExpenseItem from "../expenseItem/ExpenseItem.component";
 import { FlatList } from "react-native-gesture-handler";
 import ExpensesSummary from "../expensesSummary/ExpensesSummary.component";
 import colors from "../../constants/colors";
+import NoExpensesText from "../noExpensesText/NoExpensesText.component";
 
 const ExpensesOutput = ({ items, periodName }) => {
   return (
@@ -16,6 +17,7 @@ const ExpensesOutput = ({ items, periodName }) => {
           }, 0)
           .toFixed(2)}
       />
+      {items.length === 0 && <NoExpensesText>No Expenses Found</NoExpensesText>}
       <FlatList data={items} renderItem={({ item }) => <ExpenseItem item={item} />} keyExtractor={(item) => item.id} />
     </View>
   );

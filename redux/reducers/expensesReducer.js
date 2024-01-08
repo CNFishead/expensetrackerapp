@@ -61,7 +61,9 @@ const expenseSlice = createSlice({
       state.expenses.push({ id, ...action.payload });
     },
     removeExpense(state, action) {
+      console.log(action.payload);
       state.expenses = state.expenses.filter((expense) => expense.id !== action.payload);
+      console.log(state.expenses);
     },
     updateExpense: (state, action) => {
       const currentItem = state.expenses.find((el) => el.id === action.payload.item.id);
@@ -71,7 +73,7 @@ const expenseSlice = createSlice({
         ...action.payload.item,
       };
       // this is possible cause we can mutate it in redux toolkit
-      expenses[index] = updatedItem;
+      state.expenses[index] = updatedItem;
     },
     clearExpenses(state) {
       state.expenses = [];
