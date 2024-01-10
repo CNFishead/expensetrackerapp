@@ -4,12 +4,13 @@ import IconButton from "../components/iconButton/IconButton.component";
 import colors from "../constants/colors";
 import Button from "../components/button/Button.component";
 import { addExpense, removeExpense, updateExpense } from "../redux/reducers/expensesReducer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Input from "../components/input/Input.component";
 import moment from "moment";
 
 const ManageExpense = ({ route, navigation }) => {
   const { expenseId } = route.params;
+  const { expenses } = useSelector((state) => state.expenses);
   const dispatch = useDispatch();
 
   const handleDelete = (nav) => {
@@ -37,32 +38,37 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   };
   const confirmHandler = () => {
+    // check if the form is valid
+    // if not, show an error message
+    // if valid, then add the expense
+    if (!form.title || !form.amount || !form.date) {
+      Alert.alert("Invalid Form", "Please fill out all fields.");
+      return;
+    }
+    if (isNaN(parseFloat(form.amount))) {
+      Alert.alert("Invalid Form", "Please enter a valid amount.");
+      return;
+    }
+    // use moment to check if the date is valid
+    if (!moment(form.date).isValid()) {
+      Alert.alert("Invalid Form", "Please enter a valid date.");
+      return;
+    }
     // update or add the expense
     // if expenseId exists, then update the expense
     // otherwise, add the expense
     if (expenseId) {
       dispatch(
         updateExpense({
-          item: { id: expenseId, title: "test!!!", amount: 29.93, date: new Date("2022-23-4") },
+          item: {
+            id: expenseId,
+            title: form.title,
+            amount: parseFloat(form.amount),
+            date: new Date(form.date).toDateString(),
+          },
         })
       );
     } else {
-      // check if the form is valid
-      // if not, show an error message
-      // if valid, then add the expense
-      if (!form.title || !form.amount || !form.date) {
-        Alert.alert("Invalid Form", "Please fill out all fields.");
-        return;
-      }
-      if (isNaN(parseFloat(form.amount))) {
-        Alert.alert("Invalid Form", "Please enter a valid amount.");
-        return;
-      }
-      // use moment to check if the date is valid
-      if (!moment(form.date).isValid()) {
-        Alert.alert("Invalid Form", "Please enter a valid date.");
-        return;
-      }
       dispatch(
         addExpense({ title: form.title, amount: parseFloat(form.amount), date: new Date(form.date).toDateString() })
       );
@@ -108,6 +114,14 @@ const ManageExpense = ({ route, navigation }) => {
     if (expenseId) {
       // get the expense from the redux store
       // set the form to the expense
+      const expense = expenses.find((item) => item.id === expenseId);
+      console.log(expense);
+      console.log(moment(expense.date).format("YYYY-MM-DD").toString());
+      setForm({
+        ...expense,
+        amount: expense.amount.toString(),
+        date: moment(expense.date).format("YYYY-MM-DD").toString(),
+      });
     }
   }, [expenseId]);
   return (
@@ -129,6 +143,7 @@ const ManageExpense = ({ route, navigation }) => {
               placeholder: "YYYY-MM-DD",
               maxLength: 10,
               onChangeText: (val) => handleFormChange("date", val),
+              value: form.date,
             }}
             style={{ flex: 0.5 }}
           />
