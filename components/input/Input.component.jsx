@@ -12,7 +12,7 @@ import colors from "../../constants/colors";
  * @param {Object} props.textInputConfig - The configuration for the TextInput component. will be an object with key value pairs. e.g. { placeholder: "Enter a title" }
  * @returns {JSX.Element} The rendered Input component.
  */
-const Input = ({ label, style, textInputConfig }) => {
+const Input = ({ label, style, textInputConfig, }) => {
   let inputStyles = [styles.textInput, textInputConfig.multiline && styles.inputMultiLine];
 
   return (

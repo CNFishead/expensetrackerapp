@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Alert, Modal, StyleSheet, Text, View, TextInput } from "react-native";
 import IconButton from "../components/iconButton/IconButton.component";
 import colors from "../constants/colors";
@@ -6,6 +6,7 @@ import Button from "../components/button/Button.component";
 import { addExpense, removeExpense, updateExpense } from "../redux/reducers/expensesReducer";
 import { useDispatch } from "react-redux";
 import Input from "../components/input/Input.component";
+import moment from "moment";
 
 const ManageExpense = ({ route, navigation }) => {
   const { expenseId } = route.params;
@@ -46,7 +47,25 @@ const ManageExpense = ({ route, navigation }) => {
         })
       );
     } else {
-      dispatch(addExpense({ title: "test", amount: 99.93, date: new Date("2022-23-4") }));
+      // check if the form is valid
+      // if not, show an error message
+      // if valid, then add the expense
+      if (!form.title || !form.amount || !form.date) {
+        Alert.alert("Invalid Form", "Please fill out all fields.");
+        return;
+      }
+      if (isNaN(parseFloat(form.amount))) {
+        Alert.alert("Invalid Form", "Please enter a valid amount.");
+        return;
+      }
+      // use moment to check if the date is valid
+      if (!moment(form.date).isValid()) {
+        Alert.alert("Invalid Form", "Please enter a valid date.");
+        return;
+      }
+      dispatch(
+        addExpense({ title: form.title, amount: parseFloat(form.amount), date: new Date(form.date).toDateString() })
+      );
     }
 
     // save the expense
@@ -75,25 +94,54 @@ const ManageExpense = ({ route, navigation }) => {
     });
   }, [navigation, expenseId]);
 
+  const [form, setForm] = React.useState({
+    title: "",
+    amount: "", // number, but stored as string
+    date: "",
+  });
+
+  const handleFormChange = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  useEffect(() => {
+    if (expenseId) {
+      // get the expense from the redux store
+      // set the form to the expense
+    }
+  }, [expenseId]);
   return (
     <View style={styles.rootContainer}>
       <View style={styles.formContainer}>
         <View style={styles.group}>
           <Input
             label="Amount"
-            textInputConfig={{ keyboardType: "decimal-pad", onChangeText: () => {} }}
-            style={{ flex: .5 }}
+            textInputConfig={{
+              keyboardType: "decimal-pad",
+              onChangeText: (val) => handleFormChange("amount", val),
+              value: form.amount,
+            }}
+            style={{ flex: 0.5 }}
           />
           <Input
             label="Date"
             textInputConfig={{
               placeholder: "YYYY-MM-DD",
               maxLength: 10,
+              onChangeText: (val) => handleFormChange("date", val),
             }}
-            style={{ flex: .5 }}
+            style={{ flex: 0.5 }}
           />
         </View>
-        <Input label="Description" textInputConfig={{ keyboardType: "keyboard", multiline: true }} />
+        <Input
+          label="Description"
+          textInputConfig={{
+            keyboardType: "default",
+            multiline: true,
+            onChangeText: (val) => handleFormChange("title", val),
+            value: form.title,
+          }}
+        />
       </View>
       <View style={styles.buttonContainer}>
         <Button mode="flat" onPress={cancelHandler} style={styles.buttonStyle}>
