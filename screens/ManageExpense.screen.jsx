@@ -1,10 +1,11 @@
 import React from "react";
-import { Alert, Modal, StyleSheet, Text, View } from "react-native";
+import { Alert, Modal, StyleSheet, Text, View, TextInput } from "react-native";
 import IconButton from "../components/iconButton/IconButton.component";
 import colors from "../constants/colors";
 import Button from "../components/button/Button.component";
 import { addExpense, removeExpense, updateExpense } from "../redux/reducers/expensesReducer";
 import { useDispatch } from "react-redux";
+import Input from "../components/input/Input.component";
 
 const ManageExpense = ({ route, navigation }) => {
   const { expenseId } = route.params;
@@ -76,6 +77,24 @@ const ManageExpense = ({ route, navigation }) => {
 
   return (
     <View style={styles.rootContainer}>
+      <View style={styles.formContainer}>
+        <View style={styles.group}>
+          <Input
+            label="Amount"
+            textInputConfig={{ keyboardType: "decimal-pad", onChangeText: () => {} }}
+            style={{ flex: .5 }}
+          />
+          <Input
+            label="Date"
+            textInputConfig={{
+              placeholder: "YYYY-MM-DD",
+              maxLength: 10,
+            }}
+            style={{ flex: .5 }}
+          />
+        </View>
+        <Input label="Description" textInputConfig={{ keyboardType: "keyboard", multiline: true }} />
+      </View>
       <View style={styles.buttonContainer}>
         <Button mode="flat" onPress={cancelHandler} style={styles.buttonStyle}>
           Cancel
@@ -94,15 +113,25 @@ const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
     backgroundColor: colors.primary800,
+    padding: 8,
   },
   buttonStyle: {
     minWidth: 120,
     marginHorizontal: 8,
   },
+  formContainer: {
+    flex: 1,
+  },
+  group: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   buttonContainer: {
     borderBottomWidth: 1,
     borderBottomColor: colors.primary200,
     marginBottom: 16,
+    marginHorizontal: 8,
     padding: 8,
     flexDirection: "row",
     justifyContent: "center",
