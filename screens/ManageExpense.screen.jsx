@@ -42,16 +42,24 @@ const ManageExpense = ({ route, navigation }) => {
     // if not, show an error message
     // if valid, then add the expense
     if (!form.title || !form.amount || !form.date) {
-      Alert.alert("Invalid Form", "Please fill out all fields.");
+      // Alert.alert("Invalid Form", "Please fill out all fields.");
+      setError((prev) => ({
+        ...prev,
+        title: !form.title,
+        amount: !form.amount,
+        date: !form.date,
+      }));
       return;
     }
-    if (isNaN(parseFloat(form.amount))) {
-      Alert.alert("Invalid Form", "Please enter a valid amount.");
+    if (isNaN(parseFloat(form.amount)) || parseFloat(form.amount) < 0) {
+      // Alert.alert("Invalid Form", "Please enter a valid amount.");
+      setError((prev) => ({ ...prev, amount: true }));
       return;
     }
     // use moment to check if the date is valid
     if (!moment(form.date).isValid()) {
-      Alert.alert("Invalid Form", "Please enter a valid date.");
+      // Alert.alert("Invalid Form", "Please enter a valid date.");
+      setError((prev) => ({ ...prev, date: true }));
       return;
     }
     // update or add the expense
@@ -62,7 +70,7 @@ const ManageExpense = ({ route, navigation }) => {
         updateExpense({
           item: {
             id: expenseId,
-            title: form.title,
+            title: form.title.trim(),
             amount: parseFloat(form.amount),
             date: new Date(form.date).toDateString(),
           },
@@ -70,7 +78,11 @@ const ManageExpense = ({ route, navigation }) => {
       );
     } else {
       dispatch(
-        addExpense({ title: form.title, amount: parseFloat(form.amount), date: new Date(form.date).toDateString() })
+        addExpense({
+          title: form.title.trim(),
+          amount: parseFloat(form.amount),
+          date: new Date(form.date).toDateString(),
+        })
       );
     }
 
@@ -105,6 +117,11 @@ const ManageExpense = ({ route, navigation }) => {
     amount: "", // number, but stored as string
     date: "",
   });
+  const [error, setError] = React.useState({
+    title: false,
+    amount: false,
+    date: false,
+  });
 
   const handleFormChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -115,8 +132,6 @@ const ManageExpense = ({ route, navigation }) => {
       // get the expense from the redux store
       // set the form to the expense
       const expense = expenses.find((item) => item.id === expenseId);
-      console.log(expense);
-      console.log(moment(expense.date).format("YYYY-MM-DD").toString());
       setForm({
         ...expense,
         amount: expense.amount.toString(),
@@ -134,6 +149,8 @@ const ManageExpense = ({ route, navigation }) => {
               keyboardType: "decimal-pad",
               onChangeText: (val) => handleFormChange("amount", val),
               value: form.amount,
+              isInvalid: error.amount,
+              errorText: error.amount && "Please enter a valid amount.",
             }}
             style={{ flex: 0.5 }}
           />
@@ -144,6 +161,8 @@ const ManageExpense = ({ route, navigation }) => {
               maxLength: 10,
               onChangeText: (val) => handleFormChange("date", val),
               value: form.date,
+              isInvalid: error.date,
+              errorText: error.date && "Please enter a valid date.",
             }}
             style={{ flex: 0.5 }}
           />
@@ -155,6 +174,8 @@ const ManageExpense = ({ route, navigation }) => {
             multiline: true,
             onChangeText: (val) => handleFormChange("title", val),
             value: form.title,
+            isInvalid: error.title,
+            errorText: error.title && "Please enter a title.",
           }}
         />
       </View>
