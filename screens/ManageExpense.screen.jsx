@@ -7,6 +7,7 @@ import { addExpense, removeExpense, updateExpense } from "../redux/reducers/expe
 import { useDispatch, useSelector } from "react-redux";
 import Input from "../components/input/Input.component";
 import moment from "moment";
+import { storeExpense } from "../util/http";
 
 const ManageExpense = ({ route, navigation }) => {
   const { expenseId } = route.params;
@@ -37,7 +38,7 @@ const ManageExpense = ({ route, navigation }) => {
     // close the modal
     navigation.goBack();
   };
-  const confirmHandler = () => {
+  const confirmHandler = async () => {
     // check if the form is valid
     // if not, show an error message
     // if valid, then add the expense
@@ -77,8 +78,14 @@ const ManageExpense = ({ route, navigation }) => {
         })
       );
     } else {
+      const response = await storeExpense({
+        title: form.title.trim(),
+        amount: parseFloat(form.amount),
+        date: new Date(form.date).toISOString(),
+      });
       dispatch(
         addExpense({
+          id: response.name,
           title: form.title.trim(),
           amount: parseFloat(form.amount),
           date: new Date(form.date).toDateString(),

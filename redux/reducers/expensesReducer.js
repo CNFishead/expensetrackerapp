@@ -3,19 +3,18 @@ import { createSlice } from "@reduxjs/toolkit";
 const expenseSlice = createSlice({
   name: "expenses",
   initialState: {
-    expenses: [
-    ],
+    expenses: [],
   },
   reducers: {
+    setExpenses(state, action) {
+      state.expenses = action.payload;
+    },
     addExpense(state, action) {
       // generate a random id
-      const id = Math.random().toString() + new Date().toString();
-      state.expenses.push({ id, ...action.payload });
+      state.expenses.push(action.payload);
     },
     removeExpense(state, action) {
-      console.log(action.payload);
       state.expenses = state.expenses.filter((expense) => expense.id !== action.payload);
-      console.log(state.expenses);
     },
     updateExpense: (state, action) => {
       const currentItem = state.expenses.find((el) => el.id === action.payload.item.id);
@@ -34,4 +33,4 @@ const expenseSlice = createSlice({
 });
 
 export default expenseSlice.reducer;
-export const { addExpense, removeExpense, clearExpenses, updateExpense } = expenseSlice.actions;
+export const { addExpense, removeExpense, clearExpenses, updateExpense, setExpenses, setLoading } = expenseSlice.actions;
