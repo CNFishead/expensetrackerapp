@@ -1,4 +1,4 @@
-import { setLoading } from "../redux/reducers/expensesReducer";
+import { setExpenses, setLoading } from "../redux/reducers/expensesReducer";
 import axios from "./axios";
 
 export const storeExpense = async (expense) => {
@@ -6,8 +6,9 @@ export const storeExpense = async (expense) => {
   return data;
 };
 
-export const getExpenses = async (filterOptions) => {
+export const getExpenses = (filterOptions) => async (dispatch) => {
   try {
+    dispatch(setLoading(true));
     // filterOptions is an object of keyValue pairs, so we need to modify it to be a query string
     const filterOptionsArray = await Object.entries(filterOptions).map(([key, value]) => `${key}="${value}"&`);
     const { data } = await axios.get(`/expenses.json?${filterOptionsArray.join("")}`);
@@ -17,10 +18,11 @@ export const getExpenses = async (filterOptions) => {
     for (const key in data) {
       arrayData.push({ id: key, ...data[key] });
     }
-    console.log(arrayData);
-    return arrayData;
+    dispatch(setExpenses(arrayData));
+    dispatch(setLoading(false));
   } catch (error) {
     console.log(error);
-    return [];
+    dispatch(setExpenses([]));
+    dispatch(setLoading(false));
   }
 };

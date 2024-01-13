@@ -14,23 +14,20 @@ const AllExpenses = () => {
   useEffect(() => {
     // fetch the expenses from the server
     // store them in the redux store
-    (async () => {
-      const expensesList = await getExpenses({
+    dispatch(
+      getExpenses({
         // order by date descending with newest expenses first
         orderBy: "date",
-      });
-
-      dispatch(setExpenses(expensesList));
-    })();
+      })
+    );
   }, [dispatch]);
-
   return (
     <View style={styles.rootContainer}>
       <ExpensesOutput
         items={expenses}
         periodName={"All Expenses"}
         loading={loading}
-        // onRefresh={async () => dispatch(await getExpenses({ orderBy: "date" }))}
+        onRefresh={() => dispatch(getExpenses({ orderBy: "date" }))}
       />
     </View>
   );

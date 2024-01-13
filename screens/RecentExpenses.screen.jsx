@@ -7,7 +7,7 @@ import { clearExpenses, setExpenses } from "../redux/reducers/expensesReducer";
 import moment from "moment";
 
 const RecentExpenses = () => {
-  const { expenses } = useSelector((state) => state.expenses);
+  const { expenses, loading } = useSelector((state) => state.expenses);
   const dispatch = useDispatch();
 
   const today = new Date();
@@ -15,20 +15,24 @@ const RecentExpenses = () => {
   useEffect(() => {
     // fetch the expenses from the server
     // store them in the redux store
-    (async () => {
-      const expenses = await getExpenses({ orderBy: "date", startAt: sevenDaysAgo }); // returns an array of expenses
-      dispatch(setExpenses(expenses));
-    })();
+    dispatch(getExpenses({ orderBy: "date", startAt: sevenDaysAgo })); // returns an array of expenses
   }, [dispatch]);
 
   // create a filtered list of expenses that are within the last 7 days
-  const expensesFiltered = expenses.filter((expense) => {
+  const expensesFiltered = expenses?.filter((expense) => {
     return moment(expense.date).isAfter(sevenDaysAgo);
+  }).sort((a, b) => {
+    return moment(b.date).diff(moment(a.date));
   });
 
   return (
     <View style={styles.rootContainer}>
-      <ExpensesOutput periodName={"Last 7 Days"} items={expensesFiltered} />
+      <ExpensesOutput
+        periodName={"Last 7 Days"}
+        items={expensesFiltered}
+        loading={loading}
+        onRefresh={() => dispatch(getExpenses({ orderBy: "date", startAt: sevenDaysAgo }))}
+      />
     </View>
   );
 };

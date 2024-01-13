@@ -7,28 +7,42 @@ import colors from "../../constants/colors";
 import NoExpensesText from "../noExpensesText/NoExpensesText.component";
 import formatCurrency from "../../util/formatCurrency";
 
-const ExpensesOutput = ({ items, periodName}) => {
-  return (
-    <View style={styles.rootContainer}>
-      <ExpensesSummary
-        periodName={periodName ?? "All Expenses"}
-        sum={
-          formatCurrency(
+const ExpensesOutput = ({ items, periodName, loading, onRefresh }) => {
+  if (loading) {
+    return (
+      <View style={styles.rootContainer}>
+        <ExpensesSummary
+          periodName={periodName ?? "All Expenses"}
+          sum={formatCurrency(
             items
               ?.reduce((acc, item) => {
                 return acc + item.amount;
               }, 0)
               .toFixed(2)
-          )
-        }
+          )}
+        />
+        <NoExpensesText>Loading...</NoExpensesText>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.rootContainer}>
+      <ExpensesSummary
+        periodName={periodName ?? "All Expenses"}
+        sum={formatCurrency(
+          items
+            ?.reduce((acc, item) => {
+              return acc + item.amount;
+            }, 0)
+            .toFixed(2)
+        )}
       />
-      {/* {loading && <NoExpensesText>Loading...</NoExpensesText>} */}
       {items?.length === 0 && <NoExpensesText>No Expenses Found</NoExpensesText>}
       <FlatList
         data={items}
         renderItem={({ item }) => <ExpenseItem item={item} />}
         keyExtractor={(item) => item.id}
-        // refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}
       />
     </View>
   );
