@@ -6,6 +6,7 @@ import ExpensesSummary from "../expensesSummary/ExpensesSummary.component";
 import colors from "../../constants/colors";
 import NoExpensesText from "../noExpensesText/NoExpensesText.component";
 import formatCurrency from "../../util/formatCurrency";
+import LoadingOverlay from "../loadingOverlay/LoadingOverlay.component";
 
 const ExpensesOutput = ({ items, periodName, loading, onRefresh }) => {
   if (loading) {
@@ -21,7 +22,7 @@ const ExpensesOutput = ({ items, periodName, loading, onRefresh }) => {
               .toFixed(2)
           )}
         />
-        <NoExpensesText>Loading...</NoExpensesText>
+        <LoadingOverlay />
       </View>
     );
   }

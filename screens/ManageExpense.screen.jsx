@@ -7,11 +7,12 @@ import { addExpense, removeExpense, updateExpense } from "../redux/reducers/expe
 import { useDispatch, useSelector } from "react-redux";
 import Input from "../components/input/Input.component";
 import moment from "moment";
-import { storeExpense } from "../util/http";
+import { deleteExpenseAxios, storeExpense, updateExpenseAxios } from "../util/http";
+import LoadingOverlay from "../components/loadingOverlay/LoadingOverlay.component";
 
 const ManageExpense = ({ route, navigation }) => {
   const { expenseId } = route.params;
-  const { expenses } = useSelector((state) => state.expenses);
+  const { expenses, loading } = useSelector((state) => state.expenses);
   const dispatch = useDispatch();
 
   const handleDelete = (nav) => {
@@ -26,9 +27,10 @@ const ManageExpense = ({ route, navigation }) => {
       {
         text: "Delete",
         style: "destructive",
-        onPress: () => {
+        onPress: async () => {
           // delete the expense
-          dispatch(removeExpense(expenseId));
+          const result = await dispatch(deleteExpenseAxios(expenseId));
+          if (!result.error) dispatch(removeExpense(expenseId));
           nav.goBack();
         },
       },
@@ -67,30 +69,42 @@ const ManageExpense = ({ route, navigation }) => {
     // if expenseId exists, then update the expense
     // otherwise, add the expense
     if (expenseId) {
-      dispatch(
-        updateExpense({
-          item: {
-            id: expenseId,
-            title: form.title.trim(),
-            amount: parseFloat(form.amount),
-            date: new Date(form.date).toDateString(),
-          },
+      const result = await dispatch(
+        updateExpenseAxios(expenseId, {
+          title: form.title.trim(),
+          amount: parseFloat(form.amount),
+          date: new Date(form.date).toISOString(),
         })
       );
+      if (!result.error) {
+        console.log(`Updated expense ${expenseId}`);
+        dispatch(
+          updateExpense({
+            item: {
+              id: expenseId,
+              title: form.title.trim(),
+              amount: parseFloat(form.amount),
+              date: new Date(form.date).toDateString(),
+            },
+          })
+        );
+      }
     } else {
       const response = await storeExpense({
         title: form.title.trim(),
         amount: parseFloat(form.amount),
         date: new Date(form.date).toISOString(),
       });
-      dispatch(
-        addExpense({
-          id: response.name,
-          title: form.title.trim(),
-          amount: parseFloat(form.amount),
-          date: new Date(form.date).toDateString(),
-        })
-      );
+      if (!response.error) {
+        dispatch(
+          addExpense({
+            id: response.name,
+            title: form.title.trim(),
+            amount: parseFloat(form.amount),
+            date: new Date(form.date).toDateString(),
+          })
+        );
+      }
     }
 
     // save the expense
@@ -142,10 +156,14 @@ const ManageExpense = ({ route, navigation }) => {
       setForm({
         ...expense,
         amount: expense.amount.toString(),
-        date: moment(expense.date).format("YYYY-MM-DD").toString(),
+        date: moment(expense.date).add(1, "day").format("YYYY-MM-DD").toString(),
       });
     }
   }, [expenseId]);
+
+  if (loading) {
+    return <LoadingOverlay />;
+  }
   return (
     <View style={styles.rootContainer}>
       <View style={styles.formContainer}>

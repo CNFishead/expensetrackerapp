@@ -4,5 +4,5 @@
  * @returns {string} The formatted date string.
  */
 export const getFormattedDate = (date) => {
-  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate() + 1}`;
 };
