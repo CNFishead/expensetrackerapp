@@ -9,6 +9,7 @@ import Input from "../components/input/Input.component";
 import moment from "moment";
 import { deleteExpenseAxios, storeExpense, updateExpenseAxios } from "../util/http";
 import LoadingOverlay from "../components/loadingOverlay/LoadingOverlay.component";
+import ErrorOverlay from "../components/errorOverlay/ErrorOverlay.component";
 
 const ManageExpense = ({ route, navigation }) => {
   const { expenseId } = route.params;
@@ -30,8 +31,13 @@ const ManageExpense = ({ route, navigation }) => {
         onPress: async () => {
           // delete the expense
           const result = await dispatch(deleteExpenseAxios(expenseId));
-          if (!result.error) dispatch(removeExpense(expenseId));
-          nav.goBack();
+          if (!result.error) {
+            dispatch(removeExpense(expenseId));
+            nav.goBack();
+          } else {
+            setShowErrorOverlay(true);
+            setErrorMessage(result.message);
+          }
         },
       },
     ]);
@@ -77,7 +83,6 @@ const ManageExpense = ({ route, navigation }) => {
         })
       );
       if (!result.error) {
-        console.log(`Updated expense ${expenseId}`);
         dispatch(
           updateExpense({
             item: {
@@ -88,6 +93,11 @@ const ManageExpense = ({ route, navigation }) => {
             },
           })
         );
+        // save the expense
+        navigation.goBack();
+      } else {
+        setShowErrorOverlay(true);
+        setErrorMessage(result.message);
       }
     } else {
       const response = await storeExpense({
@@ -104,11 +114,14 @@ const ManageExpense = ({ route, navigation }) => {
             date: new Date(form.date).toDateString(),
           })
         );
+
+        // save the expense
+        navigation.goBack();
+      } else {
+        setShowErrorOverlay(true);
+        setErrorMessage(response.message);
       }
     }
-
-    // save the expense
-    navigation.goBack();
   };
 
   // if there is an expenseId, then we are editing an existing expense, change the title to "Edit Expense"
@@ -143,6 +156,8 @@ const ManageExpense = ({ route, navigation }) => {
     amount: false,
     date: false,
   });
+  const [showErrorOverlay, setShowErrorOverlay] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("An error has occured!");
 
   const handleFormChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -160,6 +175,10 @@ const ManageExpense = ({ route, navigation }) => {
       });
     }
   }, [expenseId]);
+
+  if (showErrorOverlay) {
+    return <ErrorOverlay message={errorMessage} onConfirm={() => setShowErrorOverlay(!showErrorOverlay)} />;
+  }
 
   if (loading) {
     return <LoadingOverlay />;

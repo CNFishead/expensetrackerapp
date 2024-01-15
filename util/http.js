@@ -8,8 +8,7 @@ export const storeExpense = async (expense) => {
     return { ...data, error: false };
   } catch (error) {
     console.log(error);
-    Alert.alert("Error", "Error storing expense");
-    return { error: true };
+    return { error: true, message: `Error storing expense ${error}` };
   }
 };
 
@@ -31,6 +30,7 @@ export const getExpenses = (filterOptions) => async (dispatch) => {
     console.log(error);
     dispatch(setExpenses([]));
     dispatch(setLoading(false));
+    return { error: true, message: `Error getting expenses ${error}` };
   }
 };
 
@@ -43,21 +43,19 @@ export const deleteExpenseAxios = (id) => async (dispatch) => {
   } catch (error) {
     console.log(error);
     dispatch(setLoading(false));
-    Alert.alert("Error", "Error deleting expense");
-    return { error: true };
+    return { error: true, message: `Error removing expense ` + error };
   }
 };
 
 export const updateExpenseAxios = (id, expense) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    const { data } = await axios.put(`/expenses/${id}.json1`, expense);
+    const { data } = await axios.put(`/expenses/${id}.json`, expense);
     dispatch(setLoading(false));
     return { ...data, error: false };
   } catch (error) {
     console.log(error);
     dispatch(setLoading(false));
-    Alert.alert("Error", "Error updating expense");
-    return { error: true };
+    return { error: true, message: `Error updating expense ${error}` };
   }
 };

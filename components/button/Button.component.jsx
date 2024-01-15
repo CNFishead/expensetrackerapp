@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
     backgroundColor: colors.primary500,
+    minWidth: 64,
   },
   flat: {
     backgroundColor: "transparent",
